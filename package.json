@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "superagent": "^5.2.2",
+    "ws": "^7.2.1"
+  },
+  "devDependencies": {
+    "prettier": "^1.19.1"
+  }
+}
