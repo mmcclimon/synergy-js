@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "commander": "^4.1.1",
     "superagent": "^5.2.2",
     "ws": "^7.2.1"
   },

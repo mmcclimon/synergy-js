@@ -3,6 +3,10 @@ const WebSocket = require('ws');
 
 class SlackClient {
   constructor(apiKey) {
+    if (typeof apiKey === 'undefined') {
+      throw new Error('No api key!');
+    }
+
     this.apiKey = apiKey;
     this.ourName = null;
     this.ourId = null;
