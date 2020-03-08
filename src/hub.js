@@ -4,6 +4,8 @@ const UserDirectory = require('./user-directory.js');
 
 const channel = require('./channels');
 
+const EchoReactor = require('./reactors/echo');
+
 module.exports = class SynergyHub {
   // alternate constructor
   static fromFile(filename) {
@@ -25,6 +27,8 @@ module.exports = class SynergyHub {
     for (const [name, channel] of Object.entries(config.channels)) {
       this.registerChannel(name, channel);
     }
+
+    this.reactors['echo'] = new EchoReactor({ hub: this, name: 'echo' });
   }
 
   async run() {
@@ -39,5 +43,20 @@ module.exports = class SynergyHub {
 
   handleEvent(event) {
     Logger.info(`handling event: ${event.text}`);
+
+    // naive implementation for now
+    const hits = [];
+
+    for (const reactor of Object.values(this.reactors)) {
+      hits.push(reactor.listenersMatching(event).flatMap(l => [reactor, l]));
+    }
+
+    for (const [reactor, listener] of hits) {
+      try {
+        listener.method.call(reactor, event);
+      } catch (e) {
+        Logger.error(`uh oh: ${e}`);
+      }
+    }
   }
 };
