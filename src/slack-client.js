@@ -1,5 +1,7 @@
+const util = require('util');
 const http = require('superagent');
 const WebSocket = require('ws');
+const Logger = require('./logger.js');
 
 const SlackClient = class {
   constructor(apiKey) {
@@ -30,6 +32,8 @@ const SlackClient = class {
     if (!data.ok) {
       throw new Error(`Couldn't connect to slack RTM: ${data.error}`);
     }
+
+    Logger.info('Connected to Slack!');
 
     this.ourName = data.self.name;
     this.ourId = data.self.id;
