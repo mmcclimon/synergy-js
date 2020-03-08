@@ -1,5 +1,6 @@
 const fs = require('fs');
 const SlackChannel = require('./channels/slack.js');
+const UserDirectory = require('./user-directory.js');
 
 module.exports = class SynergyHub {
   // alternate constructor
@@ -12,6 +13,8 @@ module.exports = class SynergyHub {
     this.config = config; // todo
     this.channels = [];
     this.reactors = [];
+
+    this.userDirectory = new UserDirectory(config);
 
     this.registerChannel({});
   }
