@@ -19,7 +19,8 @@ module.exports = class SynergyHub {
     this.registerChannel({});
   }
 
-  run() {
+  async run() {
+    await this.userDirectory.isReady();
     this.channels.forEach(channel => channel.start());
   }
 

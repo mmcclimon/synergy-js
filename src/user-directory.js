@@ -5,27 +5,34 @@ const User = require('./user.js');
 module.exports = class UserDirectory {
   constructor(config) {
     this._users = {};
-    this.db = null;
-    this.isReady = false;
+    this.db = new sqlite.Database(config.state_dbfile);
+    this._ready = false;
+  }
 
-    this.loadUsersFromDb(config.state_dbfile);
+  async isReady() {
+    if (this._ready) return Promise.resolve();
+
+    await this.loadUsersFromDb();
   }
 
   // TODO: factor out this database nonsense
-  // XXX: potentially racy. Eventually this should all be dealt with
-  //      asynchronously. (It is, now, but pretends not to be.
-  loadUsersFromDb(filename) {
-    this.db = new sqlite.Database(filename);
+  async loadUsersFromDb() {
+    return new Promise((resolve, reject) => {
+      this.db.each(
+        'SELECT * FROM users',
+        (err, row) => {
+          if (err) {
+            reject(err);
+            return;
+          }
 
-    this.db.each(
-      'SELECT * FROM users',
-      (err, row) => {
-        const username = row.username;
-        this._users[username] = new User({ ...row, directory: this });
-      },
-      () => {
-        this.isReady = true; // gross.
-      },
-    );
+          const username = row.username;
+          this._users[username] = new User({ ...row, directory: this });
+        },
+        () => {
+          resolve();
+        }
+      );
+    });
   }
 };
