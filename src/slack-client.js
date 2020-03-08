@@ -1,7 +1,7 @@
 const http = require('superagent');
 const WebSocket = require('ws');
 
-class SlackClient {
+const SlackClient = class {
   constructor(apiKey) {
     if (typeof apiKey === 'undefined') {
       throw new Error('No api key!');
@@ -21,11 +21,7 @@ class SlackClient {
     return http
       .get('https://slack.com/api/rtm.connect')
       .query({ token: this.apiKey })
-      .then(res => this._registerSlackRTM(res))
-      .catch(err => {
-        console.error(`couldn't start rtm api: ${err}`);
-        process.exit(1);
-      });
+      .then(res => this._registerSlackRTM(res));
   }
 
   _registerSlackRTM(res) {
@@ -48,12 +44,9 @@ class SlackClient {
 
     const interval = setInterval(() => this.ws.ping(), 10000);
     this.ws.on('close', () => clearInterval(interval));
-
-    this.ws.on('message', data => {
-      console.log(data);
-    });
-
   }
+
+  setUp() {}
 };
 
 module.exports = SlackClient;
