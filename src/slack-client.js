@@ -24,6 +24,7 @@ const SlackClient = class {
     this.teamData = null;
     this.ws = null;
     this.connected = false;
+    this.isReady = false;
 
     this.users = null;
     this.channels = null;
@@ -68,6 +69,7 @@ const SlackClient = class {
     this.loadChannels();
     this.loadGroupConversations();
     this.loadDMs();
+    this.isReady = true;
   }
 
   _apiUrl(method) {
@@ -142,6 +144,33 @@ const SlackClient = class {
 
     this.dmChannels = intoObject(data.channels, 'user', 'id');
     Logger.info('Slack DM channels loaded');
+  }
+
+  async dmChannelForAddress(slackId) {
+    let channelId = this.dmChannels[slackId];
+    if (channelId) return channelId;
+
+    // we don't have it...get it!
+    const data = await this.apiCall('convesations.open', { users: slackId });
+
+    channelId = data.ok
+      ? data.channel.id
+      : data.error === 'cannot_dm_bot'
+      ? null
+      : '0E0';
+
+    if (channelId && channelId === '0E0') {
+      Logger.info(`weird error from slack: ${JSON.stringify(data)}`);
+      return;
+    }
+
+    // don't look it up again
+    this.dmChannels[slackId] = channelId;
+    return channelId;
+  }
+
+  username(id) {
+    return this.users[id].name;
   }
 };
 

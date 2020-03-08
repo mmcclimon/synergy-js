@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Logger = require('./logger.js');
 const SlackChannel = require('./channels/slack.js');
 const UserDirectory = require('./user-directory.js');
 
@@ -26,6 +27,16 @@ module.exports = class SynergyHub {
 
   registerChannel(args) {
     // for now, just a slack channel
-    this.channels.push(new SlackChannel(this.config.slackApiToken));
+    const slack = new SlackChannel({
+      hub: this,
+      name: 'slack_fm',
+      apiToken: this.config.slackApiToken
+    });
+
+    this.channels.push(slack);
+  }
+
+  handleEvent(event) {
+    Logger.info(`handling event: ${event.text}`);
   }
 };
