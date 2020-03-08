@@ -1,4 +1,4 @@
-const Channel = require('../channel.js');
+const Channel = require('./base.js');
 const SlackClient = require('../slack-client.js');
 const Logger = require('../logger.js');
 const Event = require('../event.js');
@@ -69,11 +69,10 @@ module.exports = class SlackChannel extends Channel {
     let text = this.decodeSlackFormatting(slackEvent.text);
     let wasTargeted = false;
 
-    if (! this._targetedRegex) {
+    if (!this._targetedRegex) {
       const me = this.slack.ourName;
       this._targetedRegex = new RegExp(`^@?(${me})(?=\\W):?\\s*`, 'i');
     }
-
 
     if (this._targetedRegex.test(text)) {
       text = text.replace(this._targetedRegex, '');
@@ -96,12 +95,12 @@ module.exports = class SlackChannel extends Channel {
       fromAddress: slackEvent.user,
       fromUser: fromUser,
       transportData: slackEvent,
-      conversationAddress: slackEvent.channel,
+      conversationAddress: slackEvent.channel
     });
   }
 
   decodeSlackFormatting(text) {
-    const usernameFor = (id) => this.slack.username(id);
+    const usernameFor = id => this.slack.username(id);
 
     // Usernames: <@U123ABC>
     text = text.replace(/<\@(U[A-Z0-9]+)>/g, (_, $1) => '@' + usernameFor($1));
