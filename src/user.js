@@ -6,5 +6,11 @@ module.exports = class User {
       if (val === null) return;
       this[key] = val;
     });
+
+    this.identities = {};
+  }
+
+  addIdentity(name, val) {
+    this.identities[name] = val;
   }
 };
