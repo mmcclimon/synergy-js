@@ -1,5 +1,5 @@
-const fs = require('fs');
-const util = require('util');
+import * as fs from 'fs';
+import * as util from 'util';
 const Logger = require('./logger.js');
 const UserDirectory = require('./user-directory.js');
 
@@ -7,9 +7,14 @@ const channel = require('./channels');
 const reactor = require('./reactors');
 
 module.exports = class SynergyHub {
+  config: any;  // XXX
+  userDirectory: any;
+  channels: Record<string, any>;
+  reactors: Record<string, any>;
+
   // alternate constructor
   static fromFile(filename) {
-    const config = JSON.parse(fs.readFileSync(filename));
+    const config = JSON.parse(fs.readFileSync(filename).toString());
 
     config.channels = config.channels || {};
     config.reactors = config.reactors || {};

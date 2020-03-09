@@ -1,4 +1,6 @@
 module.exports = {
+  parser: '@typescript-eslint/parser',
+
   parserOptions: {
     ecmaVersion: 2020,
     ecmaFeatures: {},
@@ -12,13 +14,20 @@ module.exports = {
 
   plugins: ['node', 'prettier'],
 
+  ignorePatterns: ['node_modules/', 'dist/'],
+
   globals: {
     document: 'readonly',
     navigator: 'readonly',
     window: 'readonly',
   },
 
-  extends: ['eslint:recommended', 'prettier'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'prettier/@typescript-eslint',
+  ],
 
   // recommened + most best practices
   rules: {
@@ -33,7 +42,7 @@ module.exports = {
     'no-floating-decimal': 'warn',
     'no-implied-eval': 'error',
     'no-invalid-this': 'error',
-    'no-unused-vars': [
+    '@typescript-eslint/no-unused-vars': [
       'warn',
       {
         vars: 'all',

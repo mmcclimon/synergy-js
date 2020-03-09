@@ -1,5 +1,5 @@
 const opt = require('commander');
-const hub = require('../src/hub.js');
+const hub = require('../dist/hub.js');
 
 opt
   .requiredOption('-c, --config <file>', 'config file to use')
