@@ -172,6 +172,19 @@ const SlackClient = class {
   username(id) {
     return this.users[id].name;
   }
+
+  sendFrame(data) {
+    this.ws.send(JSON.stringify(data));
+  }
+
+  sendMessage(channel, text) {
+    // TODO: a bunch of complexity elided here
+    this.sendFrame({
+      type: 'message',
+      channel: channel,
+      text: text,
+    });
+  }
 };
 
 module.exports = SlackClient;

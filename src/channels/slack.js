@@ -125,4 +125,12 @@ module.exports = class SlackChannel extends Channel {
 
     return text;
   }
+
+  sendMessage(target, text) {
+    text = text.replace(/</g, '&lt;');
+    text = text.replace(/>/g, '&gt;');
+    text = text.replace(/&/g, '&amp;');
+
+    this.slack.sendMessage(target, text);
+  }
 };

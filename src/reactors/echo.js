@@ -16,6 +16,7 @@ module.exports = class EchoReactor extends Reactor {
     const from = event.fromUser ? event.fromUser.username : event.fromAddress;
     const resp = `I heard you, ${from}. You said: ${event.text}`;
 
-    Logger.info(resp);
+    event.reply(resp);
+    event.markHandled();
   }
 };

@@ -46,16 +46,16 @@ module.exports = class SynergyHub {
 
     // naive implementation for now
     const hits = [];
-
     for (const reactor of Object.values(this.reactors)) {
-      hits.push(reactor.listenersMatching(event).flatMap(l => [reactor, l]));
+      hits.push(...reactor.listenersMatching(event).map(l => [reactor, l]));
     }
 
     for (const [reactor, listener] of hits) {
       try {
         listener.method.call(reactor, event);
       } catch (e) {
-        Logger.error(`uh oh: ${e}`);
+        event.reply(`My ${reactor.name} reactor crashed while handling your message. Oopies!`);
+        Logger.error(`error with ${listener.name} listener on ${reactor.name}: ${e}`);
       }
     }
   }
