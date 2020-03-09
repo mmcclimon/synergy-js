@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { sprintf } = require('sprintf-js');
+const util = require('util');
 const Logger = require('./logger.js');
 const UserDirectory = require('./user-directory.js');
 
@@ -46,7 +46,7 @@ module.exports = class SynergyHub {
 
   handleEvent(event) {
     Logger.info(
-      sprintf(
+      util.format(
         '%s event from %s/%s: %s',
         event.type,
         event.fromChannel.name,
@@ -65,14 +65,14 @@ module.exports = class SynergyHub {
       try {
         listener.method.call(reactor, event);
       } catch (e) {
-        const resp = sprintf(
+        const resp = util.format(
           'My %s reactor crashed while handling your message...oopies!',
           reactor.name
         );
 
         event.reply(resp);
         Logger.error(
-          sprintf(
+          util.format(
             'error with %s listener on %s: %s',
             listener.name,
             reactor.name,

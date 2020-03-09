@@ -1,4 +1,4 @@
-const { sprintf } = require('sprintf-js');
+const util = require('util');
 
 const Channel = require('./base.js');
 const SlackClient = require('../slack-client.js');
@@ -51,7 +51,7 @@ module.exports = class SlackChannel extends Channel {
     const event = this.synergyEventFromSlackEvent(slackEvent);
     if (!event) {
       Logger.warn(
-        sprintf(
+        util.format(
           "couldn't convert a %s/%s message to channel %s, dropping it",
           slackEvent.type,
           slackEvent.subtype ? slackEvent.subType : '[none]',
