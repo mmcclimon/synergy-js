@@ -182,7 +182,7 @@ const SlackClient = class {
     this.sendFrame({
       type: 'message',
       channel: channel,
-      text: text,
+      text: text
     });
   }
 };

@@ -9,9 +9,8 @@ module.exports = class Event {
   reply(text, alts, args) {
     Logger.debug(`sending ${text} to someone`);
 
-    const prefix = this.fromUser && this.isPublic
-      ? `${this.fromUser.username}: `
-      : '';
+    const prefix =
+      this.fromUser && this.isPublic ? `${this.fromUser.username}: ` : '';
 
     text = prefix + text;
 

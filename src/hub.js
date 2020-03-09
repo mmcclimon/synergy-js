@@ -3,8 +3,7 @@ const Logger = require('./logger.js');
 const UserDirectory = require('./user-directory.js');
 
 const channel = require('./channels');
-
-const EchoReactor = require('./reactors/echo');
+const reactor = require('./reactors');
 
 module.exports = class SynergyHub {
   // alternate constructor
@@ -24,11 +23,13 @@ module.exports = class SynergyHub {
 
     this.userDirectory = new UserDirectory(config);
 
-    for (const [name, channel] of Object.entries(config.channels)) {
-      this.registerChannel(name, channel);
-    }
+    for (const thingType of ['channel', 'reactor']) {
+      const plural = thingType + 's';
 
-    this.reactors['echo'] = new EchoReactor({ hub: this, name: 'echo' });
+      for (const [name, cfg] of Object.entries(config[plural])) {
+        this.registerThing(thingType, name, cfg);
+      }
+    }
   }
 
   async run() {
@@ -36,9 +37,10 @@ module.exports = class SynergyHub {
     Object.values(this.channels).forEach(channel => channel.start());
   }
 
-  registerChannel(name, config) {
-    const chan = channel.fromConfig(this, name, config);
-    this.channels[name] = chan;
+  registerThing(thingType, name, config) {
+    const plural = thingType + 's';
+    const thing = thingType === 'channel' ? channel : reactor;
+    this[plural][name] = thing.fromConfig(this, name, config);
   }
 
   handleEvent(event) {
@@ -54,8 +56,12 @@ module.exports = class SynergyHub {
       try {
         listener.method.call(reactor, event);
       } catch (e) {
-        event.reply(`My ${reactor.name} reactor crashed while handling your message. Oopies!`);
-        Logger.error(`error with ${listener.name} listener on ${reactor.name}: ${e}`);
+        event.reply(
+          `My ${reactor.name} reactor crashed while handling your message. Oopies!`
+        );
+        Logger.error(
+          `error with ${listener.name} listener on ${reactor.name}: ${e}`
+        );
       }
     }
   }

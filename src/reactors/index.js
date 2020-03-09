@@ -1,7 +1,7 @@
 const HubComponent = require('../hub-component.js');
 
 const REGISTRY = {
-  SlackChannel: require('./slack.js')
+  EchoReactor: require('./echo.js')
 };
 
 const fromConfig = function() {
