@@ -1,8 +1,27 @@
-const http = require('superagent');
-const WebSocket = require('ws');
-const Logger = require('./logger.js');
+import * as http from 'superagent';
+import * as WebSocket from 'ws';
 
-const SlackClient = class {
+import Logger from './logger';
+
+interface WebSocket {
+  on: (eventType: string, cb: (...data) => void) => void;
+  ping: () => void;
+  send: (data: string) => void;
+}
+
+export class SlackClient {
+  apiKey: string;
+  ourName: string;
+  ourId: string;
+  teamData: Record<string, any>;
+  ws: WebSocket;
+  connected: boolean;
+  isReady: boolean;
+  users: Record<string, any>;
+  channels: Record<string, any>;
+  dmChannels: Record<string, string>;
+  groupConversations: Record<string, any>;
+
   constructor(apiKey) {
     if (typeof apiKey === 'undefined') {
       throw new Error('No api key!');
@@ -22,7 +41,7 @@ const SlackClient = class {
     this.groupConversations = null;
   }
 
-  connect() {
+  connect(): Promise<void> {
     this.connected = false;
 
     return http
@@ -31,7 +50,7 @@ const SlackClient = class {
       .then(res => this._registerSlackRTM(res));
   }
 
-  _registerSlackRTM(res) {
+  _registerSlackRTM(res): void {
     const data = res.body;
 
     if (!data.ok) {
@@ -53,7 +72,7 @@ const SlackClient = class {
     this.ws.on('close', () => clearInterval(interval));
   }
 
-  setUp() {
+  setUp(): void {
     Logger.info('Connected to Slack!');
     this.loadUsers();
     this.loadChannels();
@@ -62,15 +81,15 @@ const SlackClient = class {
     this.isReady = true;
   }
 
-  _apiUrl(method) {
+  _apiUrl(method: string): string {
     return `https://slack.com/api/${method}`;
   }
 
-  get _apiAuthHeader() {
+  get _apiAuthHeader(): string {
     return `Bearer ${this.apiKey}`;
   }
 
-  apiCall(method, data) {
+  apiCall(method, data): Promise<Record<string, any>> {
     let postType = 'json';
 
     if (data._formEncoded) {
@@ -94,7 +113,7 @@ const SlackClient = class {
       });
   }
 
-  async loadUsers() {
+  async loadUsers(): Promise<void> {
     const data = await this.apiCall('users.list', { presence: false });
     this.users = Object.fromEntries(data.members.map(u => [u.id, u]));
 
@@ -104,7 +123,7 @@ const SlackClient = class {
     Logger.info('Slack users loaded');
   }
 
-  async loadChannels() {
+  async loadChannels(): Promise<void> {
     const data = await this.apiCall('conversations.list', {
       _formEncoded: true,
       excludeArchived: true,
@@ -115,7 +134,7 @@ const SlackClient = class {
     Logger.info('Slack channels loaded');
   }
 
-  async loadGroupConversations() {
+  async loadGroupConversations(): Promise<void> {
     const data = await this.apiCall('conversations.list', {
       _formEncoded: true,
       types: 'mpim,private_channel',
@@ -127,7 +146,7 @@ const SlackClient = class {
     Logger.info('Slack group conversations loaded');
   }
 
-  async loadDMs() {
+  async loadDMs(): Promise<void> {
     const data = await this.apiCall('conversations.list', {
       _formEncoded: true,
       excludeArchived: true,
@@ -140,7 +159,7 @@ const SlackClient = class {
     Logger.info('Slack DM channels loaded');
   }
 
-  async dmChannelForAddress(slackId) {
+  async dmChannelForAddress(slackId): Promise<string> {
     let channelId = this.dmChannels[slackId];
     if (channelId) return channelId;
 
@@ -163,15 +182,15 @@ const SlackClient = class {
     return channelId;
   }
 
-  username(id) {
+  username(id): string {
     return this.users[id].name;
   }
 
-  sendFrame(data) {
+  sendFrame(data): void {
     this.ws.send(JSON.stringify(data));
   }
 
-  sendMessage(channel, text) {
+  sendMessage(channel, text): void {
     // TODO: a bunch of complexity elided here
     this.sendFrame({
       type: 'message',
@@ -179,6 +198,4 @@ const SlackClient = class {
       text: text,
     });
   }
-};
-
-module.exports = SlackClient;
+}

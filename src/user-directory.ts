@@ -1,26 +1,36 @@
-const sqlite = require('sqlite3');
-const User = require('./user.js');
-const Logger = require('./logger.js');
+import * as sqlite from 'sqlite3';
 
-module.exports = class UserDirectory {
+// compat shim
+interface Database {
+  each: (stmt: string, rowCb: (err, row) => void, doneCb: (err, row) => void) => void;
+}
+
+import { User } from './user';
+import Logger from './logger';
+
+export class UserDirectory {
+  #users: Record<string, User>;
+  #ready: boolean;
+  db: Database;
+
   constructor(config) {
-    this._users = {};
+    this.#users = {};
     this.db = new sqlite.Database(config.state_dbfile);
-    this._ready = false;
+    this.#ready = false;
   }
 
-  async isReady() {
-    if (this._ready) return Promise.resolve();
+  async isReady(): Promise<void> {
+    if (this.#ready) return Promise.resolve();
 
     await this.loadUsersFromDb();
-    this._ready = true;
+    this.#ready = true;
     return Promise.resolve();
   }
 
   // eslint-disable-next-line require-await
-  async loadUsersFromDb() {
+  async loadUsersFromDb(): Promise<void> {
     // this is a wrapper around this.db.each that returns promises
-    const genPromise = (stmt, cb) => {
+    const genPromise = (stmt: string, cb: (row) => void): Promise<void> => {
       return new Promise((resolve, reject) => {
         this.db.each(
           stmt,
@@ -38,7 +48,7 @@ module.exports = class UserDirectory {
 
     const loadUsers = genPromise('SELECT * FROM users', row => {
       const username = row.username;
-      this._users[username] = new User({ ...row, directory: this });
+      this.#users[username] = new User({ ...row, directory: this });
     });
 
     const loadIdentities = genPromise(
@@ -46,7 +56,7 @@ module.exports = class UserDirectory {
       async row => {
         await loadUsers; // we must have loaded the users before we do this
         const username = row.username;
-        const user = this._users[username];
+        const user = this.#users[username];
 
         if (user) {
           user.addIdentity(row.identity_name, row.identity_value);
@@ -59,18 +69,18 @@ module.exports = class UserDirectory {
     return loadIdentities;
   }
 
-  get users() {
-    return Object.values(this._users).filter(u => !u.is_deleted);
+  get users(): Array<User> {
+    return Object.values(this.#users).filter(u => !u.isDeleted);
   }
 
-  userByChannelAndAddress(channelName, address) {
+  userByChannelAndAddress(channelName: string, addr: string): User | undefined {
     for (const user of this.users) {
       const identity = user.identities[channelName];
-      if (identity === address) {
+      if (identity === addr) {
         return user;
       }
     }
 
     return undefined;
   }
-};
+}

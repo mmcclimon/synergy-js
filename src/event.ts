@@ -1,12 +1,23 @@
-const Logger = require('./logger.js');
+import Logger from './logger';
+import { User } from './user';
+import { Channel } from './channels/base';
 
-module.exports = class Event {
+export class SynergyEvent {
+  handled: boolean;
+  isPublic: boolean;
+  fromUser?: User;
+  fromChannel: Channel;
+  conversationAddress: string;
+  wasTargeted: boolean;
+  fromAddress: string;
+  text: string;
+
   constructor(arg) {
     Object.assign(this, arg); // ha, terrible.
     this.handled = false;
   }
 
-  reply(text, _alts, _args) {
+  reply(text, _alts?, _args?): void {
     Logger.debug(`sending ${text} to someone`);
 
     const prefix =
@@ -18,7 +29,7 @@ module.exports = class Event {
     this.fromChannel.sendMessage(this.conversationAddress, text);
   }
 
-  markHandled() {
+  markHandled(): void {
     this.handled = true;
   }
-};
+}

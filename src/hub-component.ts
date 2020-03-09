@@ -1,15 +1,24 @@
-const fromConfig = function(registry, hub, name, config) {
-  const constructor = registry[config.class];
+import { Hub } from './hub';
 
-  if (!constructor) throw new Error(`no class for reactor ${name}!`);
+// for want of a role...
+export abstract class HubComponent {
+  name: string;
+  hub: Hub;
 
-  return new constructor({
-    hub: hub,
-    name: name,
-    ...config,
-  });
-};
+  constructor(arg) {
+    this.name = arg.name;
+    this.hub = arg.hub;
+  }
 
-module.exports = {
-  fromConfig: fromConfig,
-};
+  static fromConfig(registry, hub, name, config): HubComponent {
+    const builder = registry[config.class];
+
+    if (!builder) throw new Error(`no class for reactor ${name}!`);
+
+    return new builder({
+      hub: hub,
+      name: name,
+      ...config,
+    });
+  }
+}

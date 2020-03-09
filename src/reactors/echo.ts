@@ -1,22 +1,22 @@
-const Reactor = require('./base.js');
-// const Logger = require('../logger.js');
+import { Reactor, Listener } from './base';
+import { SynergyEvent } from '../event';
 
-module.exports = class EchoReactor extends Reactor {
-  get listenerSpecs() {
+export class EchoReactor extends Reactor {
+  get listenerSpecs(): Array<Listener> {
     return [
       {
         name: 'echo',
         method: this.echo,
-        predicate: e => e.wasTargeted,
+        predicate: (e: SynergyEvent): boolean => e.wasTargeted,
       },
     ];
   }
 
-  echo(event) {
+  echo(event: SynergyEvent): void {
     const from = event.fromUser ? event.fromUser.username : event.fromAddress;
     const resp = `I heard you, ${from}. You said: ${event.text}`;
 
     event.reply(resp);
     event.markHandled();
   }
-};
+}

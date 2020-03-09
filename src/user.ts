@@ -1,16 +1,25 @@
-module.exports = class User {
-  constructor(arg) {
-    // hacky and dumb, but good enough for right now
-    Object.keys(arg).forEach(key => {
-      const val = arg[key];
-      if (val === null) return;
-      this[key] = val;
-    });
+import { UserDirectory } from './user-directory';
 
+export class User {
+  directory: UserDirectory;
+  username: string;
+  lpId?: string;
+  isMaster: boolean;
+  isVirtual: boolean;
+  isDeleted: boolean;
+  identities: Record<string, string>;
+
+  constructor(arg) {
+    this.directory = arg.directory;
+    this.username = arg.username;
+    this.lpId = arg.lp_id;
+    this.isMaster = arg.is_master || false;
+    this.isVirtual = arg.is_virtual || false;
+    this.isDeleted = arg.is_deleted || false;
     this.identities = {};
   }
 
-  addIdentity(name, val) {
+  addIdentity(name: string, val: string): void {
     this.identities[name] = val;
   }
-};
+}

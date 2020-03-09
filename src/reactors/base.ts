@@ -1,16 +1,25 @@
-module.exports = class Reactor {
+import { HubComponent } from '../hub-component';
+import { SynergyEvent } from '../event';
+
+export interface Listener {
+  name: string;
+  method: (event: SynergyEvent) => void;
+  predicate: (event: SynergyEvent) => boolean;
+}
+
+export abstract class Reactor extends HubComponent {
   constructor(arg) {
-    this.name = arg.name;
-    this.hub = arg.hub;
+    super(arg);
   }
 
-  start() {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  start(): void {}
 
-  get listenerSpecs() {
+  get listenerSpecs(): Array<Listener> {
     return [];
   }
 
-  listenersMatching(event) {
+  listenersMatching(event): Array<Listener> {
     return this.listenerSpecs.filter(l => l.predicate(event));
   }
-};
+}

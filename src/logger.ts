@@ -1,11 +1,20 @@
-const winston = require('winston');
-const format = winston.format;
+import * as winston from 'winston';
 
-const logger = winston.createLogger({
+type LoggerCall = (msg: string) => void;
+
+export interface Logger {
+  info: LoggerCall;
+  warn: LoggerCall;
+  error: LoggerCall;
+  debug: LoggerCall;
+}
+
+const format = winston.format;
+const logger: Logger = winston.createLogger({
   level: process.env.DEBUG ? 'debug' : 'info',
   format: format.cli(),
   defaultMeta: { service: 'synergy' },
   transports: [new winston.transports.Console()],
 });
 
-module.exports = logger;
+export default logger;

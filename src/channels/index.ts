@@ -1,13 +1,12 @@
-const HubComponent = require('../hub-component.js');
+import { HubComponent } from '../hub-component';
+import { SlackChannel } from './slack';
 
 const REGISTRY = {
-  SlackChannel: require('./slack.js'),
+  SlackChannel: SlackChannel,
 };
 
-const fromConfig = function() {
-  return HubComponent.fromConfig(REGISTRY, ...arguments);
+const fromConfig = function(hub, name, config): HubComponent {
+  return HubComponent.fromConfig(REGISTRY, hub, name, config);
 };
 
-module.exports = {
-  fromConfig: fromConfig,
-};
+export { fromConfig };

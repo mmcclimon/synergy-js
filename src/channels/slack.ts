@@ -1,22 +1,26 @@
-const util = require('util');
+import * as util from 'util';
 
-const Channel = require('./base.js');
-const SlackClient = require('../slack-client.js');
-const Logger = require('../logger.js');
-const Event = require('../event.js');
+import { Channel } from './base';
+import { SynergyEvent } from '../event';
+import { SlackClient } from '../slack-client';
+import Logger from '../logger';
 
-module.exports = class SlackChannel extends Channel {
+export class SlackChannel extends Channel {
+  #targetedRegex: RegExp;
+  slack: SlackClient;
+
+
   constructor(arg) {
     super(arg);
     this.slack = new SlackClient(arg.apiToken);
   }
 
-  async start() {
+  async start(): Promise<void> {
     await this.slack.connect();
     this.slack.ws.on('message', data => this.handleFrame(data));
   }
 
-  handleFrame(data) {
+  handleFrame(data): void {
     if (!data) return;
 
     const slackEvent = JSON.parse(data);
@@ -34,7 +38,7 @@ module.exports = class SlackChannel extends Channel {
     }
   }
 
-  handleMessage(slackEvent) {
+  handleMessage(slackEvent): void {
     if (!this.slack.isReady) {
       Logger.info('ignoring Slack message; slack client not fully set up');
       return;
@@ -63,7 +67,7 @@ module.exports = class SlackChannel extends Channel {
     this.hub.handleEvent(event);
   }
 
-  synergyEventFromSlackEvent(slackEvent) {
+  synergyEventFromSlackEvent(slackEvent): SynergyEvent {
     const privateAddr = slackEvent.channel.startsWith('G')
       ? slackEvent.channel
       : this.slack.dmChannelForAddress(slackEvent.user);
@@ -78,13 +82,13 @@ module.exports = class SlackChannel extends Channel {
     let text = this.decodeSlackFormatting(slackEvent.text);
     let wasTargeted = false;
 
-    if (!this._targetedRegex) {
+    if (!this.#targetedRegex) {
       const me = this.slack.ourName;
-      this._targetedRegex = new RegExp(`^@?(${me})(?=\\W):?\\s*`, 'i');
+      this.#targetedRegex = new RegExp(`^@?(${me})(?=\\W):?\\s*`, 'i');
     }
 
-    if (this._targetedRegex.test(text)) {
-      text = text.replace(this._targetedRegex, '');
+    if (this.#targetedRegex.test(text)) {
+      text = text.replace(this.#targetedRegex, '');
       wasTargeted = true;
     }
 
@@ -95,7 +99,7 @@ module.exports = class SlackChannel extends Channel {
       wasTargeted = true;
     }
 
-    return new Event({
+    return new SynergyEvent({
       type: 'message',
       text: text,
       wasTargeted: wasTargeted,
@@ -108,8 +112,8 @@ module.exports = class SlackChannel extends Channel {
     });
   }
 
-  decodeSlackFormatting(text) {
-    const usernameFor = id => this.slack.username(id);
+  decodeSlackFormatting(text: string): string {
+    const usernameFor = (id: string): string => this.slack.username(id);
 
     // Usernames: <@U123ABC>
     text = text.replace(/<@(U[A-Z0-9]+)>/g, (_, $1) => '@' + usernameFor($1));
@@ -135,7 +139,7 @@ module.exports = class SlackChannel extends Channel {
     return text;
   }
 
-  sendMessage(target, text) {
+  sendMessage(target, text): void {
     text = text.replace(/</g, '&lt;');
     text = text.replace(/>/g, '&gt;');
     text = text.replace(/&/g, '&amp;');

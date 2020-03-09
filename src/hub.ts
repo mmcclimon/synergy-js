@@ -1,25 +1,26 @@
 import * as fs from 'fs';
 import * as util from 'util';
-const Logger = require('./logger.js');
-const UserDirectory = require('./user-directory.js');
 
-const channel = require('./channels');
-const reactor = require('./reactors');
+import Logger from './logger';
+import { UserDirectory } from './user-directory';
 
-module.exports = class SynergyHub {
-  config: any;  // XXX
+import * as Channel from './channels';
+import * as Reactor from './reactors';
+
+export class Hub {
+  config: any; // XXX
   userDirectory: any;
   channels: Record<string, any>;
   reactors: Record<string, any>;
 
   // alternate constructor
-  static fromFile(filename) {
+  static fromFile(filename): Hub {
     const config = JSON.parse(fs.readFileSync(filename).toString());
 
     config.channels = config.channels || {};
     config.reactors = config.reactors || {};
 
-    return new SynergyHub(config);
+    return new Hub(config);
   }
 
   constructor(config) {
@@ -45,7 +46,7 @@ module.exports = class SynergyHub {
 
   registerThing(thingType, name, config) {
     const plural = thingType + 's';
-    const thing = thingType === 'channel' ? channel : reactor;
+    const thing = thingType === 'channel' ? Channel : Reactor;
     this[plural][name] = thing.fromConfig(this, name, config);
   }
 
@@ -87,4 +88,4 @@ module.exports = class SynergyHub {
       }
     }
   }
-};
+}
