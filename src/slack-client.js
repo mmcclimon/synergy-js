@@ -2,15 +2,6 @@ const http = require('superagent');
 const WebSocket = require('ws');
 const Logger = require('./logger.js');
 
-const intoObject = function(arr, key, val) {
-  return arr.reduce((acc, el) => {
-    const k = el[key];
-    const v = val ? el[val] : el;
-    acc[k] = v;
-    return acc;
-  }, {});
-};
-
 const SlackClient = class {
   constructor(apiKey) {
     if (typeof apiKey === 'undefined') {
@@ -105,7 +96,7 @@ const SlackClient = class {
 
   async loadUsers() {
     const data = await this.apiCall('users.list', { presence: false });
-    this.users = intoObject(data.members, 'id');
+    this.users = Object.fromEntries(data.members.map(u => [u.id, u]));
 
     // fix up ourselves, because sometimes the name isn't right.
     this.users[this.ourId].name = this.ourName;
@@ -120,7 +111,7 @@ const SlackClient = class {
       types: 'public_channel',
     });
 
-    this.channels = intoObject(data.channels, 'id');
+    this.channels = Object.fromEntries(data.channels.map(c => [c.id, c]));
     Logger.info('Slack channels loaded');
   }
 
@@ -130,7 +121,9 @@ const SlackClient = class {
       types: 'mpim,private_channel',
     });
 
-    this.groupConversations = intoObject(data.channels, 'id');
+    this.groupConversations = Object.fromEntries(
+      data.channels.map(c => [c.id, c])
+    );
     Logger.info('Slack group conversations loaded');
   }
 
@@ -141,7 +134,9 @@ const SlackClient = class {
       types: 'im',
     });
 
-    this.dmChannels = intoObject(data.channels, 'user', 'id');
+    this.dmChannels = Object.fromEntries(
+      data.channels.map(c => [c.user, c.id])
+    );
     Logger.info('Slack DM channels loaded');
   }
 
