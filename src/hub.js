@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { sprintf } = require('sprintf-js');
 const Logger = require('./logger.js');
 const UserDirectory = require('./user-directory.js');
 
@@ -44,7 +45,15 @@ module.exports = class SynergyHub {
   }
 
   handleEvent(event) {
-    Logger.info(`handling event: ${event.text}`);
+    Logger.info(
+      sprintf(
+        '%s event from %s/%s: %s',
+        event.type,
+        event.fromChannel.name,
+        event.fromUser ? `u:${event.fromUser.username}` : event.fromAddress,
+        event.text
+      )
+    );
 
     // naive implementation for now
     const hits = [];
@@ -56,11 +65,19 @@ module.exports = class SynergyHub {
       try {
         listener.method.call(reactor, event);
       } catch (e) {
-        event.reply(
-          `My ${reactor.name} reactor crashed while handling your message. Oopies!`
+        const resp = sprintf(
+          'My %s reactor crashed while handling your message...oopies!',
+          reactor.name
         );
+
+        event.reply(resp);
         Logger.error(
-          `error with ${listener.name} listener on ${reactor.name}: ${e}`
+          sprintf(
+            'error with %s listener on %s: %s',
+            listener.name,
+            reactor.name,
+            e
+          )
         );
       }
     }
