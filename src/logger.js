@@ -5,7 +5,7 @@ const logger = winston.createLogger({
   level: process.env.DEBUG ? 'debug' : 'info',
   format: format.cli(),
   defaultMeta: { service: 'synergy' },
-  transports: [new winston.transports.Console()]
+  transports: [new winston.transports.Console()],
 });
 
 module.exports = logger;

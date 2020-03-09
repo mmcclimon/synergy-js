@@ -6,10 +6,10 @@ const fromConfig = function(registry, hub, name, config) {
   return new constructor({
     hub: hub,
     name: name,
-    ...config
+    ...config,
   });
 };
 
 module.exports = {
-  fromConfig: fromConfig
+  fromConfig: fromConfig,
 };

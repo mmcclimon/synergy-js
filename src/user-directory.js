@@ -1,4 +1,3 @@
-const util = require('util');
 const sqlite = require('sqlite3');
 const User = require('./user.js');
 const Logger = require('./logger.js');
@@ -19,6 +18,7 @@ module.exports = class UserDirectory {
     return Promise.resolve();
   }
 
+  // eslint-disable-next-line require-await
   async loadUsersFromDb() {
     // this is a wrapper around this.db.each that returns promises
     const genPromise = (stmt, cb) => {

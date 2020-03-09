@@ -1,3 +1,5 @@
+const { sprintf } = require('sprintf-js');
+
 const Channel = require('./base.js');
 const SlackClient = require('../slack-client.js');
 const Logger = require('../logger.js');
@@ -47,6 +49,17 @@ module.exports = class SlackChannel extends Channel {
     if (slackEvent.bot_id) return;
 
     const event = this.synergyEventFromSlackEvent(slackEvent);
+    if (!event) {
+      Logger.warn(
+        sprintf(
+          "couldn't convert a %s/%s message to channel %s, dropping it",
+          slackEvent.type,
+          slackEvent.subtype ? slackEvent.subType : '[none]',
+          slackEvent.channel
+        )
+      );
+      return;
+    }
     this.hub.handleEvent(event);
   }
 
@@ -61,10 +74,6 @@ module.exports = class SlackChannel extends Channel {
       this.name,
       slackEvent.user
     );
-
-    const fromUsername = fromUser
-      ? fromUser.username
-      : this.slack.username(slackEvent.user);
 
     let text = this.decodeSlackFormatting(slackEvent.text);
     let wasTargeted = false;
@@ -95,7 +104,7 @@ module.exports = class SlackChannel extends Channel {
       fromAddress: slackEvent.user,
       fromUser: fromUser,
       transportData: slackEvent,
-      conversationAddress: slackEvent.channel
+      conversationAddress: slackEvent.channel,
     });
   }
 
@@ -103,7 +112,7 @@ module.exports = class SlackChannel extends Channel {
     const usernameFor = id => this.slack.username(id);
 
     // Usernames: <@U123ABC>
-    text = text.replace(/<\@(U[A-Z0-9]+)>/g, (_, $1) => '@' + usernameFor($1));
+    text = text.replace(/<@(U[A-Z0-9]+)>/g, (_, $1) => '@' + usernameFor($1));
 
     // Channels: <#C123ABC|bottest>
     text = text.replace(/<#[CD](?:[A-Z0-9]+)\|(.*?)>/g, (_, $1) => '#' + $1);

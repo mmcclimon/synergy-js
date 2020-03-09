@@ -6,7 +6,7 @@ module.exports = class Event {
     this.handled = false;
   }
 
-  reply(text, alts, args) {
+  reply(text, _alts, _args) {
     Logger.debug(`sending ${text} to someone`);
 
     const prefix =

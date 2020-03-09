@@ -1,7 +1,7 @@
 const HubComponent = require('../hub-component.js');
 
 const REGISTRY = {
-  SlackChannel: require('./slack.js')
+  SlackChannel: require('./slack.js'),
 };
 
 const fromConfig = function() {
@@ -9,5 +9,5 @@ const fromConfig = function() {
 };
 
 module.exports = {
-  fromConfig: fromConfig
+  fromConfig: fromConfig,
 };

@@ -1,4 +1,3 @@
-const util = require('util');
 const http = require('superagent');
 const WebSocket = require('ws');
 const Logger = require('./logger.js');
@@ -118,7 +117,7 @@ const SlackClient = class {
     const data = await this.apiCall('conversations.list', {
       _formEncoded: true,
       excludeArchived: true,
-      types: 'public_channel'
+      types: 'public_channel',
     });
 
     this.channels = intoObject(data.channels, 'id');
@@ -128,7 +127,7 @@ const SlackClient = class {
   async loadGroupConversations() {
     const data = await this.apiCall('conversations.list', {
       _formEncoded: true,
-      types: 'mpim,private_channel'
+      types: 'mpim,private_channel',
     });
 
     this.groupConversations = intoObject(data.channels, 'id');
@@ -139,7 +138,7 @@ const SlackClient = class {
     const data = await this.apiCall('conversations.list', {
       _formEncoded: true,
       excludeArchived: true,
-      types: 'im'
+      types: 'im',
     });
 
     this.dmChannels = intoObject(data.channels, 'user', 'id');
@@ -182,7 +181,7 @@ const SlackClient = class {
     this.sendFrame({
       type: 'message',
       channel: channel,
-      text: text
+      text: text,
     });
   }
 };

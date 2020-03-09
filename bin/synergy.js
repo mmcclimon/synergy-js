@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 const opt = require('commander');
 const hub = require('../src/hub.js');
 

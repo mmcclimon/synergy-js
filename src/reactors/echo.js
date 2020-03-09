@@ -1,5 +1,5 @@
 const Reactor = require('./base.js');
-const Logger = require('../logger.js');
+// const Logger = require('../logger.js');
 
 module.exports = class EchoReactor extends Reactor {
   get listenerSpecs() {
@@ -7,8 +7,8 @@ module.exports = class EchoReactor extends Reactor {
       {
         name: 'echo',
         method: this.echo,
-        predicate: e => e.wasTargeted
-      }
+        predicate: e => e.wasTargeted,
+      },
     ];
   }
 
