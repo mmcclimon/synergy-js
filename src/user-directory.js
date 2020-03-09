@@ -6,7 +6,6 @@ module.exports = class UserDirectory {
   constructor(config) {
     this._users = {};
     this.db = new sqlite.Database(config.state_dbfile);
-    this.db.serialize();
     this._ready = false;
   }
 
@@ -42,18 +41,22 @@ module.exports = class UserDirectory {
       this._users[username] = new User({ ...row, directory: this });
     });
 
-    const loadIdentities = genPromise('SELECT * FROM user_identities', row => {
-      const username = row.username;
-      const user = this._users[username];
+    const loadIdentities = genPromise(
+      'SELECT * FROM user_identities',
+      async row => {
+        await loadUsers; // we must have loaded the users before we do this
+        const username = row.username;
+        const user = this._users[username];
 
-      if (user) {
-        user.addIdentity(row.identity_name, row.identity_value);
-      } else {
-        Logger.warn(`found identity for ${username}, but no matching user`);
+        if (user) {
+          user.addIdentity(row.identity_name, row.identity_value);
+        } else {
+          Logger.warn(`found identity for ${username}, but no matching user`);
+        }
       }
-    });
+    );
 
-    return loadUsers.then(() => loadIdentities);
+    return loadIdentities;
   }
 
   get users() {
