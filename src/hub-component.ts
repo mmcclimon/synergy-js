@@ -10,11 +10,12 @@ export abstract class HubComponent {
     this.hub = arg.hub;
   }
 
-  static fromConfig(registry, hub, name, config): HubComponent {
-    const builder = registry[config.class];
-
-    if (!builder) throw new Error(`no class for reactor ${name}!`);
-
+  static fromConfig<A extends HubComponent>(
+    builder: new (arg) => A,
+    hub,
+    name,
+    config
+  ): A {
     return new builder({
       hub: hub,
       name: name,
