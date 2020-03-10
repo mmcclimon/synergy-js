@@ -1,5 +1,5 @@
-import { HubComponent } from '../hub-component';
-import { SynergyEvent } from '../event';
+import HubComponent from '../hub-component';
+import SynergyEvent from '../event';
 
 export interface Listener {
   name: string;

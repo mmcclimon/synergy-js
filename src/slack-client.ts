@@ -9,7 +9,7 @@ interface WebSocket {
   send: (data: string) => void;
 }
 
-export class SlackClient {
+export default class SlackClient {
   apiKey: string;
   ourName: string;
   ourId: string;

@@ -2,28 +2,32 @@ import * as sqlite from 'sqlite3';
 
 // compat shim
 interface Database {
-  each: (stmt: string, rowCb: (err, row) => void, doneCb: (err, row) => void) => void;
+  each: (
+    stmt: string,
+    rowCb: (err, row) => void,
+    doneCb: (err, row) => void
+  ) => void;
 }
 
-import { User } from './user';
+import User from './user';
 import Logger from './logger';
 
-export class UserDirectory {
-  #users: Record<string, User>;
-  #ready: boolean;
+export default class UserDirectory {
+  private _users: Record<string, User>;
+  private ready: boolean;
   db: Database;
 
   constructor(config) {
-    this.#users = {};
+    this._users = {};
     this.db = new sqlite.Database(config.state_dbfile);
-    this.#ready = false;
+    this.ready = false;
   }
 
   async isReady(): Promise<void> {
-    if (this.#ready) return Promise.resolve();
+    if (this.ready) return Promise.resolve();
 
     await this.loadUsersFromDb();
-    this.#ready = true;
+    this.ready = true;
     return Promise.resolve();
   }
 
@@ -48,7 +52,7 @@ export class UserDirectory {
 
     const loadUsers = genPromise('SELECT * FROM users', row => {
       const username = row.username;
-      this.#users[username] = new User({ ...row, directory: this });
+      this._users[username] = new User({ ...row, directory: this });
     });
 
     const loadIdentities = genPromise(
@@ -56,7 +60,7 @@ export class UserDirectory {
       async row => {
         await loadUsers; // we must have loaded the users before we do this
         const username = row.username;
-        const user = this.#users[username];
+        const user = this._users[username];
 
         if (user) {
           user.addIdentity(row.identity_name, row.identity_value);
@@ -70,7 +74,7 @@ export class UserDirectory {
   }
 
   get users(): Array<User> {
-    return Object.values(this.#users).filter(u => !u.isDeleted);
+    return Object.values(this._users).filter(u => !u.isDeleted);
   }
 
   userByChannelAndAddress(channelName: string, addr: string): User | undefined {

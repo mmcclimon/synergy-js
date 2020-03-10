@@ -1,7 +1,7 @@
 import { Hub } from './hub';
 
 // for want of a role...
-export abstract class HubComponent {
+export default abstract class HubComponent {
   name: string;
   hub: Hub;
 

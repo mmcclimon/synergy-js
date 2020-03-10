@@ -1,8 +1,8 @@
 import Logger from './logger';
-import { User } from './user';
-import { Channel } from './channels/base';
+import User from './user';
+import Channel from './channels/base';
 
-export class SynergyEvent {
+export default class SynergyEvent {
   handled: boolean;
   isPublic: boolean;
   fromUser?: User;

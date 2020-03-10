@@ -2,13 +2,13 @@ import * as fs from 'fs';
 import * as util from 'util';
 
 import Logger from './logger';
-import { UserDirectory } from './user-directory';
-import { SynergyEvent } from './event';
+import UserDirectory from './user-directory';
+import SynergyEvent from './event';
 
-import { HubComponent } from './hub-component';
-import { Channel } from './channels/base';
+import HubComponent from './hub-component';
+import Channel from './channels/base';
 import { Reactor } from './reactors/base';
-import { ComponentRegistry } from './component-registry';
+import ComponentRegistry from './component-registry';
 
 // not great, but it's something
 interface Config {

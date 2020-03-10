@@ -2,7 +2,7 @@ import * as winston from 'winston';
 
 type LoggerCall = (msg: string) => void;
 
-export interface Logger {
+interface Logger {
   info: LoggerCall;
   warn: LoggerCall;
   error: LoggerCall;

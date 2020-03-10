@@ -1,14 +1,13 @@
 import * as util from 'util';
 
-import { Channel } from './base';
-import { SynergyEvent } from '../event';
-import { SlackClient } from '../slack-client';
+import Channel from './base';
+import SynergyEvent from '../event';
+import SlackClient from '../slack-client';
 import Logger from '../logger';
 
-export class SlackChannel extends Channel {
-  #targetedRegex: RegExp;
+export default class SlackChannel extends Channel {
+  private targetedRegex: RegExp;
   slack: SlackClient;
-
 
   constructor(arg) {
     super(arg);
@@ -82,13 +81,13 @@ export class SlackChannel extends Channel {
     let text = this.decodeSlackFormatting(slackEvent.text);
     let wasTargeted = false;
 
-    if (!this.#targetedRegex) {
+    if (!this.targetedRegex) {
       const me = this.slack.ourName;
-      this.#targetedRegex = new RegExp(`^@?(${me})(?=\\W):?\\s*`, 'i');
+      this.targetedRegex = new RegExp(`^@?(${me})(?=\\W):?\\s*`, 'i');
     }
 
-    if (this.#targetedRegex.test(text)) {
-      text = text.replace(this.#targetedRegex, '');
+    if (this.targetedRegex.test(text)) {
+      text = text.replace(this.targetedRegex, '');
       wasTargeted = true;
     }
 
@@ -146,4 +145,4 @@ export class SlackChannel extends Channel {
 
     this.slack.sendMessage(target, text);
   }
-};
+}

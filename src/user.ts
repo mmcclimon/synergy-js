@@ -1,6 +1,6 @@
-import { UserDirectory } from './user-directory';
+import UserDirectory from './user-directory';
 
-export class User {
+export default class User {
   directory: UserDirectory;
   username: string;
   lpId?: string;
