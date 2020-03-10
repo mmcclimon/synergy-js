@@ -4,8 +4,7 @@ import * as util from 'util';
 import Logger from './logger';
 import { UserDirectory } from './user-directory';
 
-import * as Channel from './channels';
-import * as Reactor from './reactors';
+import { HubComponent, ComponentRegistry } from './hub-component';
 
 export class Hub {
   config: any; // XXX
@@ -46,8 +45,10 @@ export class Hub {
 
   registerThing(thingType, name, config) {
     const plural = thingType + 's';
-    const thing = thingType === 'channel' ? Channel : Reactor;
-    this[plural][name] = thing.fromConfig(this, name, config);
+
+    const builder = ComponentRegistry[plural][config.class];
+
+    this[plural][name] = HubComponent.fromConfig(builder, this, name, config);
   }
 
   handleEvent(event) {

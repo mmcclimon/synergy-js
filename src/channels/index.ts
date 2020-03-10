@@ -1,16 +1,7 @@
-import { HubComponent } from '../hub-component';
+import { ComponentBuilder } from '../hub-component';
 import { Channel } from './base';
 import { SlackChannel } from './slack';
 
-type ChannelRegistry = Record<string, new (arg) => Channel>;
-
-const registry: ChannelRegistry = {
+export const ChannelRegistry: Record<string, ComponentBuilder<Channel>> = {
   SlackChannel: SlackChannel,
 };
-
-const fromConfig = function(hub, name, config): Channel {
-  const builder = registry[config.class];
-  return HubComponent.fromConfig(builder, hub, name, config);
-};
-
-export { fromConfig };
