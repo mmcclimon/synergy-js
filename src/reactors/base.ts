@@ -1,13 +1,8 @@
 import HubComponent from '../hub-component';
+import type { Listener } from './';
 import SynergyEvent from '../event';
 
-export interface Listener {
-  name: string;
-  method: (event: SynergyEvent) => void;
-  predicate: (event: SynergyEvent) => boolean;
-}
-
-export abstract class Reactor extends HubComponent {
+export default abstract class BaseReactor extends HubComponent {
   constructor(arg) {
     super(arg);
   }
@@ -19,7 +14,7 @@ export abstract class Reactor extends HubComponent {
     return [];
   }
 
-  listenersMatching(event): Array<Listener> {
+  listenersMatching(event: SynergyEvent): Array<Listener> {
     return this.listenerSpecs.filter(l => l.predicate(event));
   }
 }

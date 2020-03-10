@@ -1,7 +1,8 @@
-import { Reactor, Listener } from './base';
+import BaseReactor  from './base';
+import type { Listener } from './';
 import SynergyEvent from '../event';
 
-export default class EchoReactor extends Reactor {
+export default class EchoReactor extends BaseReactor {
   get listenerSpecs(): Array<Listener> {
     return [
       {

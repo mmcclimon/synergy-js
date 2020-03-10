@@ -1,11 +1,11 @@
 import * as util from 'util';
 
-import Channel from './base';
+import BaseChannel from './base';
 import SynergyEvent from '../event';
 import SlackClient from '../slack-client';
 import Logger from '../logger';
 
-export default class SlackChannel extends Channel {
+export default class SlackChannel extends BaseChannel {
   private targetedRegex: RegExp;
   slack: SlackClient;
 

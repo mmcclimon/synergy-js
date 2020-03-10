@@ -1,6 +1,6 @@
 import HubComponent from '../hub-component';
 
-export default abstract class Channel extends HubComponent {
+export default abstract class BaseChannel extends HubComponent {
   constructor(arg) {
     super(arg);
   }
