@@ -1,4 +1,4 @@
-import { ComponentBuilder } from '../hub-component';
+import type { ComponentBuilder } from '../hub-component';
 import { Reactor } from './base';
 import { EchoReactor } from './echo';
 

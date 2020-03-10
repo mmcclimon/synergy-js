@@ -25,17 +25,3 @@ export abstract class HubComponent {
 }
 
 export type ComponentBuilder<A extends HubComponent> = new (arg) => A;
-
-export type ComponentRegistryRecord = Record<
-  string,
-  ComponentBuilder<HubComponent>
->;
-
-// we must do this here because there is a circular dependency. meh.
-import { ChannelRegistry } from './channels';
-import { ReactorRegistry } from './reactors';
-
-export const ComponentRegistry: Record<string, ComponentRegistryRecord> = {
-  channels: ChannelRegistry,
-  reactors: ReactorRegistry,
-};

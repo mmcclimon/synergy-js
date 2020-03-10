@@ -1,4 +1,4 @@
-import { ComponentBuilder } from '../hub-component';
+import type { ComponentBuilder } from '../hub-component';
 import { Channel } from './base';
 import { SlackChannel } from './slack';
 
