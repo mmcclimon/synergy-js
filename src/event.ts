@@ -11,6 +11,7 @@ export class SynergyEvent {
   wasTargeted: boolean;
   fromAddress: string;
   text: string;
+  type: string;
 
   constructor(arg) {
     Object.assign(this, arg); // ha, terrible.
