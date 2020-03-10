@@ -23,5 +23,3 @@ export abstract class HubComponent {
     });
   }
 }
-
-export type ComponentBuilder<A extends HubComponent> = new (arg) => A;
