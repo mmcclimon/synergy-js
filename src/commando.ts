@@ -1,4 +1,4 @@
-// import Logger from './logger';
+import Logger from './logger';
 import SynergyEvent from './event';
 import {
   Listener,
@@ -31,20 +31,21 @@ export default class Commando {
     this.specs.get(klass)[name] = spec;
   }
 
-  // TODO: dynamic dispatch
   static dispatch(event): void {
     const [command] = event.text.split(/\s+/, 2);
 
     // maybe, match both dynamically and statically, but I think this is
     // probably not backward compatible with existing synergy commands
-    const handler = this.staticDispatch[command] || this.matchDynamic(event);
+    const staticHandler = this.staticDispatch[command];
 
-    if (handler) {
-      handler(event);
+    if (staticHandler) {
+      return staticHandler(event);
     }
+
+    return this.dispatchDynamic(event);
   }
 
-  static matchDynamic(event: SynergyEvent): ReactorHandler | undefined {
+  static dispatchDynamic(event: SynergyEvent): void {
     const hits = [];
 
     for (const matcher of this.dynamicMatchers) {
@@ -53,8 +54,11 @@ export default class Commando {
       }
     }
 
-    // XXX dupe detection, this is silly
-    return hits[0];
+    if (hits.length > 1) Logger.verbose('todo: exclusive detection');
+
+    hits.forEach(handler => handler(event));
+
+    return;
   }
 
   static reifyCommandsOn(reactor: Reactor): void {
