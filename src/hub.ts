@@ -9,6 +9,7 @@ import HubComponent from './hub-component';
 import { Channel } from './channels';
 import { Reactor } from './reactors';
 import ComponentRegistry from './component-registry';
+import Commando from './commando';
 
 // not great, but it's something
 interface Config {
@@ -24,6 +25,7 @@ export class Hub {
   userDirectory: UserDirectory;
   channels: Record<string, Channel>;
   reactors: Record<string, Reactor>;
+  commando: typeof Commando;
 
   // alternate constructor
   static fromFile(filename): Hub {
@@ -39,6 +41,7 @@ export class Hub {
     this.config = config; // todo
     this.channels = {};
     this.reactors = {};
+    this.commando = Commando;
 
     this.userDirectory = new UserDirectory(config);
 
@@ -63,8 +66,12 @@ export class Hub {
     const plural = thingType + 's';
 
     const builder = ComponentRegistry[plural][config.class];
+    const component = HubComponent.fromConfig(builder, this, name, config);
 
-    this[plural][name] = HubComponent.fromConfig(builder, this, name, config);
+    this[plural][name] = component;
+
+    // at this time, we have a reactor.
+    this.commando.reifyCommandsOn(component);
   }
 
   handleEvent(event: SynergyEvent): void {
@@ -78,31 +85,6 @@ export class Hub {
       )
     );
 
-    // naive implementation for now
-    const hits = [];
-    for (const reactor of Object.values(this.reactors)) {
-      hits.push(...reactor.listenersMatching(event).map(l => [reactor, l]));
-    }
-
-    for (const [reactor, listener] of hits) {
-      try {
-        listener.method.call(reactor, event);
-      } catch (e) {
-        const resp = util.format(
-          'My %s reactor crashed while handling your message...oopies!',
-          reactor.name
-        );
-
-        event.reply(resp);
-        Logger.error(
-          util.format(
-            'error with %s listener on %s: %s',
-            listener.name,
-            reactor.name,
-            e
-          )
-        );
-      }
-    }
+    this.commando.dispatch(event);
   }
 }

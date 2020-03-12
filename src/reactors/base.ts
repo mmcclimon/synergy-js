@@ -1,5 +1,5 @@
 import HubComponent from '../hub-component';
-import type { Listener } from './';
+import { Listener } from './';
 import SynergyEvent from '../event';
 
 export default abstract class BaseReactor extends HubComponent {
