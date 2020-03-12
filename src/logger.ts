@@ -7,11 +7,12 @@ interface Logger {
   warn: LoggerCall;
   error: LoggerCall;
   debug: LoggerCall;
+  verbose: LoggerCall;
 }
 
 const format = winston.format;
 const logger: Logger = winston.createLogger({
-  level: process.env.DEBUG ? 'debug' : 'info',
+  level: process.env.DEBUG ? 'debug' : 'verbose',
   format: format.cli(),
   defaultMeta: { service: 'synergy' },
   transports: [new winston.transports.Console()],
