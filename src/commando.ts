@@ -1,27 +1,34 @@
-import { Reactor, ReactorConstructor } from './reactors';
+import {
+  Listener,
+  Reactor,
+  ReactorConstructor,
+  ReactorHandler,
+} from './reactors';
+
+type ListenerSpec = Record<string, Listener>;
 
 // this is a singleton
 export default class Commando {
-  private static specs: Map<
-    ReactorConstructor,
-    Record<string, any>
-  > = new Map();
+  private static specs: Map<ReactorConstructor, ListenerSpec> = new Map();
+  private static staticDispatch: Record<string, ReactorHandler> = {};
 
-  static staticDispatch = {};
-
-  static registerListener(name, spec): void {
+  static registerListener(name: string, spec: Listener): void {
     const klass = spec.klass;
+
     if (!this.specs.has(klass)) {
       this.specs.set(klass, {});
     }
+
     this.specs.get(klass)[name] = spec;
   }
 
+  // TODO: dynamic dispatch
   static dispatch(event): void {
-    const [word] = event.text.split(/\s+/, 2);
-    let handler;
+    const [command] = event.text.split(/\s+/, 2);
 
-    if ((handler = this.staticDispatch[word])) {
+    const handler = this.staticDispatch[command];
+
+    if (handler) {
       handler(event);
     }
   }
