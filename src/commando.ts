@@ -1,9 +1,9 @@
-import HubComponent from './hub-component';
+import { Reactor, ReactorConstructor } from './reactors';
 
 // this is a singleton
 export default class Commando {
   private static specs: Map<
-    typeof HubComponent,
+    ReactorConstructor,
     Record<string, any>
   > = new Map();
 
@@ -26,8 +26,8 @@ export default class Commando {
     }
   }
 
-  static reifyCommandsOn(reactor: HubComponent): void {
-    const specs = this.specs.get(reactor.constructor as typeof HubComponent);
+  static reifyCommandsOn(reactor: Reactor): void {
+    const specs = this.specs.get(reactor.constructor as ReactorConstructor);
     if (!specs) return;
 
     for (const [name, spec] of Object.entries(specs)) {

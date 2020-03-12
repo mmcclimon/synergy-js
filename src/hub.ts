@@ -8,7 +8,7 @@ import SynergyEvent from './event';
 import HubComponent from './hub-component';
 import { Channel } from './channels';
 import { Reactor } from './reactors';
-import ComponentRegistry from './component-registry';
+import { ChannelRegistry, ReactorRegistry } from './component-registry';
 import Commando from './commando';
 
 // not great, but it's something
@@ -45,33 +45,33 @@ export class Hub {
 
     this.userDirectory = new UserDirectory(config);
 
-    for (const thingType of ['channel', 'reactor']) {
-      const plural = thingType + 's';
+    Object.entries(config.channels).forEach(([name, config]) => {
+      this.registerChannel(name, config);
+    });
 
-      for (const [name, cfg] of Object.entries(config[plural])) {
-        this.registerThing(thingType, name, cfg);
-      }
-    }
+    Object.entries(config.reactors).forEach(([name, config]) => {
+      this.registerReactor(name, config);
+    });
   }
 
   async run(): Promise<void> {
     await this.userDirectory.isReady();
     Object.values(this.channels).forEach(channel => channel.start());
-
-    // not sure this is actually right
-    return Promise.resolve();
+    return;
   }
 
-  registerThing(thingType, name, config): void {
-    const plural = thingType + 's';
+  registerChannel(name, cfg): void {
+    const builder = ChannelRegistry[cfg.class];
+    const channel: Channel = HubComponent.fromConfig(builder, this, name, cfg);
+    this.channels[name] = channel;
+  }
 
-    const builder = ComponentRegistry[plural][config.class];
-    const component = HubComponent.fromConfig(builder, this, name, config);
+  registerReactor(name, cfg): void {
+    const builder = ReactorRegistry[cfg.class];
+    const reactor: Reactor = HubComponent.fromConfig(builder, this, name, cfg);
+    this.reactors[name] = reactor;
 
-    this[plural][name] = component;
-
-    // at this time, we have a reactor.
-    this.commando.reifyCommandsOn(component);
+    this.commando.reifyCommandsOn(reactor);
   }
 
   handleEvent(event: SynergyEvent): void {

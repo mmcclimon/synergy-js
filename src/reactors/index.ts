@@ -17,4 +17,6 @@ export interface Reactor {
   listenersMatching: (event: SynergyEvent) => Array<Listener>;
 }
 
+export type ReactorConstructor = new (arg) => Reactor;
+
 export { EchoReactor };

@@ -2,20 +2,12 @@ import HubComponent from './hub-component';
 import { Channel, SlackChannel } from './channels';
 import { Reactor, EchoReactor } from './reactors';
 
-type ComponentBuilder<A extends HubComponent> = new (arg) => A;
-type RegistryRecord = Record<string, ComponentBuilder<HubComponent>>;
+type RegistryRecord<A extends HubComponent> = Record<string, new (arg) => A>;
 
-const ChannelRegistry: Record<string, ComponentBuilder<Channel>> = {
+export const ChannelRegistry: RegistryRecord<Channel> = {
   SlackChannel: SlackChannel,
 };
 
-const ReactorRegistry: Record<string, ComponentBuilder<Reactor>> = {
+export const ReactorRegistry: RegistryRecord<Reactor> = {
   EchoReactor: EchoReactor,
 };
-
-const ComponentRegistry: Record<string, RegistryRecord> = {
-  channels: ChannelRegistry,
-  reactors: ReactorRegistry,
-};
-
-export default ComponentRegistry;
