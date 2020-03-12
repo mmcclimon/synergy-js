@@ -55,5 +55,6 @@ module.exports = {
     'no-throw-literal': 'warn',
     'prefer-regex-literals': 'warn',
     'require-await': 'warn',
+    '@typescript-eslint/no-empty-function': 'warn',
   },
 };
