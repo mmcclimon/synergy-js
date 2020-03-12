@@ -2,6 +2,7 @@ import { Hub } from '../hub';
 import SynergyEvent from '../event';
 
 import EchoReactor from './echo';
+import CloxReactor from './clox';
 
 export type ReactorConstructor = new (arg) => Reactor;
 export type ReactorHandler = (event: SynergyEvent) => void;
@@ -19,4 +20,4 @@ export interface Reactor {
 }
 
 // re-export all the reactor types
-export { EchoReactor };
+export { CloxReactor, EchoReactor };
