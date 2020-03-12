@@ -10,7 +10,9 @@ export type ReactorHandler = (event: SynergyEvent) => void;
 export interface Listener {
   handler: ReactorHandler;
   klass: ReactorConstructor;
-  match?: RegExp;
+  match?: RegExp | ((e: SynergyEvent) => boolean);
+  aliases?: Array<string>;
+  passive?: boolean;
 }
 
 export interface Reactor {
