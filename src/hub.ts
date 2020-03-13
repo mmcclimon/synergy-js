@@ -45,13 +45,12 @@ export class Hub {
 
     this.userDirectory = new UserDirectory(config);
 
-    Object.entries(config.channels).forEach(([name, config]) => {
-      this.registerChannel(name, config);
-    });
+    for (const thing of ['channels', 'reactors']) {
+      const meth = thing === 'channels' ? 'registerChannel' : 'registerReactor';
+      const fn = this[meth].bind(this);
 
-    Object.entries(config.reactors).forEach(([name, config]) => {
-      this.registerReactor(name, config);
-    });
+      Object.entries(config[thing]).forEach(([name, cfg]) => fn(name, cfg));
+    }
   }
 
   async run(): Promise<void> {

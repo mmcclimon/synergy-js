@@ -8,7 +8,14 @@ import {
 } from './reactors';
 
 type ListenerSpec = Record<string, Listener>;
+
+type StaticMatcher = {
+  name: string;
+  handler: ReactorHandler;
+};
+
 type DynamicMatcher = {
+  name: string;
   predicate: (e: SynergyEvent) => boolean;
   handler: ReactorHandler;
 };
@@ -16,7 +23,7 @@ type DynamicMatcher = {
 // this is a singleton
 export default class Commando {
   private static specs: Map<ReactorConstructor, ListenerSpec> = new Map();
-  private static staticDispatch: Record<string, ReactorHandler> = {};
+  private static staticMatchers: Record<string, StaticMatcher> = {};
   private static dynamicMatchers: Array<DynamicMatcher> = [];
 
   static registerListener(name: string, spec: Listener): void {
@@ -36,10 +43,10 @@ export default class Commando {
 
     // maybe, match both dynamically and statically, but I think this is
     // probably not backward compatible with existing synergy commands
-    const staticHandler = this.staticDispatch[command];
+    const staticMatch = this.staticMatchers[command];
 
-    if (staticHandler) {
-      return staticHandler(event);
+    if (staticMatch) {
+      return staticMatch.handler(event);
     }
 
     return this.dispatchDynamic(event);
@@ -75,13 +82,15 @@ export default class Commando {
         this.dynamicMatchers.push({
           predicate: predicate,
           handler: bound,
+          name: name,
         });
       } else {
         // if it doesn't, we'll put it and all of its aliases statically
-        this.staticDispatch[name] = bound;
+        const match = { name: name, handler: bound };
+        this.staticMatchers[name] = match;
 
         spec.aliases.forEach(alias => {
-          this.staticDispatch[alias] = bound;
+          this.staticMatchers[alias] = match;
         });
       }
     }
