@@ -1,5 +1,6 @@
 import { Hub } from '../hub';
 import SlackChannel from './slack';
+import ConsoleChannel from './console';
 
 export interface Channel {
   name: string;
@@ -8,4 +9,4 @@ export interface Channel {
   sendMessage: (addr: string, text: string) => void;
 }
 
-export { SlackChannel };
+export { SlackChannel, ConsoleChannel };
