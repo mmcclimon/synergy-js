@@ -48,7 +48,7 @@ module.exports = {
         vars: 'all',
         args: 'none',
         ignoreRestSiblings: true,
-        varsIgnorePattern: '^_+$',
+        varsIgnorePattern: '^(_|Logger$)',
       },
     ],
     'no-self-compare': 'error',
