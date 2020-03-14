@@ -42,9 +42,17 @@ Commando.registerListener('clox', {
         .utc()
         .add(offset, 'minutes');
 
-      const pretty = targetTime.format('ddd, HH:mm');
+      const timeStr = targetTime.format('HH:mm [on] dddd');
+      let zoneStr = moment.tz.zone(zone).abbr(now);
 
-      resp.push(`${moment.tz.zone(zone).abbr(now)}: ${pretty}`);
+      // this will be much nicer when node fully supports optional chaining:
+      // const zoneStr = this.hub.config.timeZoneNames?.[zone] || moment.tz.zone(zone).abbr(now);
+
+      if (this.hub.config.timeZoneNames) {
+        zoneStr = this.hub.config.timeZoneNames[zone] || zoneStr;
+      }
+
+      resp.push(`${zoneStr}: ${timeStr}`);
     });
 
     event.reply(resp.join('\n'));

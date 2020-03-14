@@ -17,6 +17,7 @@ interface Config {
   channels: Record<string, Record<string, any>>;
   reactors: Record<string, Record<string, any>>;
   state_dbfile?: string;
+  timeZoneNames?: Record<string, string>;
   /* eslint-enable @typescript-eslint/no-explicit-any */
 }
 
