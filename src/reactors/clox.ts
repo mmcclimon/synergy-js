@@ -16,8 +16,6 @@ Commando.registerListener('clox', {
   aliases: ['clocks'],
   klass: CloxReactor,
   handler: function(event) {
-    event.markHandled();
-
     // TODO: get zones from user directory
     const tzNames = ['America/New_York', 'Australia/Sydney', 'Etc/UTC'];
 

@@ -86,5 +86,9 @@ export class Hub {
     );
 
     this.commando.dispatch(event);
+
+    if (!event.handled) {
+      event.reply('Does not compute');
+    }
   }
 }

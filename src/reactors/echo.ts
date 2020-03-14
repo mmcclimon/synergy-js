@@ -11,6 +11,5 @@ Commando.registerListener('echo', {
     const resp = `I heard you, ${from}. You said: ${event.text}`;
 
     event.reply(resp);
-    event.markHandled();
   },
 });

@@ -3,7 +3,7 @@ import User from './user';
 import Channel from './channels/base';
 
 export default class SynergyEvent {
-  handled: boolean;
+  private _handled: boolean;
   isPublic: boolean;
   fromUser?: User;
   fromChannel: Channel;
@@ -33,10 +33,14 @@ export default class SynergyEvent {
     this.fromAddress = fromAddress;
     this.text = text;
     this.type = type;
-    this.handled = false;
+    this._handled = false;
   }
 
-  reply(text, _alts?, _args?): void {
+  get handled(): boolean {
+    return this._handled;
+  }
+
+  reply(text, arg?: { handle: boolean }): void {
     Logger.debug(`sending ${text} to someone`);
 
     const prefix =
@@ -46,9 +50,11 @@ export default class SynergyEvent {
 
     // TODO: alts, editing
     this.fromChannel.sendMessage(this.conversationAddress, text);
-  }
 
-  markHandled(): void {
-    this.handled = true;
+    const shouldHandle = arg && arg.handle ? arg.handle : true;
+
+    if (shouldHandle) {
+      this._handled = true;
+    }
   }
 }
