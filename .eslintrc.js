@@ -56,5 +56,6 @@ module.exports = {
     'prefer-regex-literals': 'warn',
     'require-await': 'warn',
     '@typescript-eslint/no-empty-function': 'warn',
+    '@typescript-eslint/camelcase': 'off',
   },
 };

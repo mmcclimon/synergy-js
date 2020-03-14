@@ -9,13 +9,20 @@ export default class User {
   isDeleted: boolean;
   identities: Record<string, string>;
 
-  constructor(arg) {
-    this.directory = arg.directory;
-    this.username = arg.username;
-    this.lpId = arg.lp_id;
-    this.isMaster = arg.is_master || false;
-    this.isVirtual = arg.is_virtual || false;
-    this.isDeleted = arg.is_deleted || false;
+  constructor({
+    directory,
+    username,
+    lp_id,
+    is_master = false,
+    is_virtual = false,
+    is_deleted = false,
+  }) {
+    this.directory = directory;
+    this.username = username;
+    this.lpId = lp_id;
+    this.isMaster = is_master;
+    this.isVirtual = is_virtual;
+    this.isDeleted = is_deleted;
     this.identities = {};
   }
 

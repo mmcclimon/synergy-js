@@ -12,9 +12,27 @@ export default class SynergyEvent {
   fromAddress: string;
   text: string;
   type: string;
+  transportData: any;
 
-  constructor(arg) {
-    Object.assign(this, arg); // ha, terrible.
+  constructor({
+    isPublic,
+    fromUser = undefined,
+    fromChannel,
+    conversationAddress,
+    wasTargeted,
+    fromAddress,
+    text,
+    type,
+    transportData,
+  }) {
+    this.isPublic = isPublic;
+    this.fromUser = fromUser;
+    this.fromChannel = fromChannel;
+    this.conversationAddress = conversationAddress;
+    this.wasTargeted = wasTargeted;
+    this.fromAddress = fromAddress;
+    this.text = text;
+    this.type = type;
     this.handled = false;
   }
 

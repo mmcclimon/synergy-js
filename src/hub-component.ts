@@ -5,9 +5,9 @@ export default abstract class HubComponent {
   name: string;
   hub: Hub;
 
-  constructor(arg) {
-    this.name = arg.name;
-    this.hub = arg.hub;
+  constructor({ name, hub }) {
+    this.name = name;
+    this.hub = hub;
   }
 
   static fromConfig<A extends HubComponent>(
