@@ -21,5 +21,7 @@ export interface Reactor {
   start: () => void;
 }
 
-// re-export all the reactor types
-export { CloxReactor, EchoReactor };
+export const ReactorRegistry: Record<string, new (arg) => Reactor> = {
+  CloxReactor: CloxReactor,
+  EchoReactor: EchoReactor,
+};

@@ -6,9 +6,8 @@ import UserDirectory from './user-directory';
 import SynergyEvent from './event';
 
 import HubComponent from './hub-component';
-import { Channel } from './channels';
-import { Reactor } from './reactors';
-import { ChannelRegistry, ReactorRegistry } from './component-registry';
+import { Channel, ChannelRegistry } from './channels';
+import { Reactor, ReactorRegistry } from './reactors';
 import Commando from './commando';
 
 // not great, but it's something

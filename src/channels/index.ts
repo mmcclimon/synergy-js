@@ -9,4 +9,7 @@ export interface Channel {
   sendMessage: (addr: string, text: string) => void;
 }
 
-export { SlackChannel, ConsoleChannel };
+export const ChannelRegistry: Record<string, new (arg) => Channel> = {
+  SlackChannel: SlackChannel,
+  ConsoleChannel: ConsoleChannel,
+};
