@@ -1,7 +1,10 @@
+import * as moment from 'moment-timezone';
 import * as sqlite from 'sqlite3';
 
 // compat shim
 interface Database {
+  get: (...args) => void;
+  run: (...args) => void;
   each: (
     stmt: string,
     rowCb: (err, row) => void,
@@ -9,26 +12,61 @@ interface Database {
   ) => void;
 }
 
-import User from './user';
 import Logger from './logger';
+import { Preferences } from './preferences';
+import User from './user';
 
 export default class UserDirectory {
   private _users: Record<string, User>;
   private ready: boolean;
   db: Database;
+  prefs: Preferences;
+  name = 'UserDirectory';
 
   constructor(config) {
     this._users = {};
     this.db = new sqlite.Database(config.state_dbfile);
     this.ready = false;
+    this.prefs = new Preferences(this, 'user');
+
+    this.setUpPrefs();
   }
 
   async isReady(): Promise<void> {
     if (this.ready) return Promise.resolve();
 
     await this.loadUsersFromDb();
+    await this.fetchState();
+
     this.ready = true;
     return Promise.resolve();
+  }
+
+  // obviously, should not belong here
+  saveState(): void {
+    const data = JSON.stringify({ preferences: this.prefs });
+    this.db.run(
+      'INSERT OR REPLACE INTO synergy_state (reactor_name, stored_at, json) VALUES (?, ?, ?)',
+      'users',
+      Math.floor(Date.now() / 1000),
+      data
+    );
+  }
+
+  // eslint-disable-next-line require-await
+  async fetchState(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT json FROM synergy_state WHERE reactor_name = ?',
+        'users',
+        (err, row) => {
+          if (err) return reject(err);
+
+          this.prefs.load(JSON.parse(row.json));
+          resolve();
+        }
+      );
+    });
   }
 
   // eslint-disable-next-line require-await
@@ -77,6 +115,22 @@ export default class UserDirectory {
     return Object.values(this._users).filter(u => !u.isDeleted);
   }
 
+  resolveName(name: string, resolvingUser?: User): User | undefined {
+    if (!name) return;
+
+    name = name.toLowerCase().replace(/^@/, '');
+
+    if (name === 'me' || name === 'my' || name === 'myself' || name === 'i') {
+      return resolvingUser;
+    }
+
+    const user = this._users[name];
+
+    // TODO: nicknames
+
+    return user;
+  }
+
   userByChannelAndAddress(channelName: string, addr: string): User | undefined {
     for (const user of this.users) {
       const identity = user.identities[channelName];
@@ -85,6 +139,20 @@ export default class UserDirectory {
       }
     }
 
-    return undefined;
+    return;
+  }
+
+  setUpPrefs(): void {
+    const p = this.prefs;
+
+    p.addPreference('time-zone', {
+      validator: (val, evt): [string, string] => {
+        const isValid = !!moment.tz.zone(val);
+
+        return isValid
+          ? [undefined, val]
+          : [`${val} is not a valid time zone name`, undefined];
+      },
+    });
   }
 }

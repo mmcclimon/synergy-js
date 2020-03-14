@@ -3,6 +3,7 @@ import SynergyEvent from '../event';
 
 import EchoReactor from './echo';
 import CloxReactor from './clox';
+import PrefsReactor from './prefs';
 
 export type ReactorConstructor = new (arg) => Reactor;
 export type ReactorHandler = (event: SynergyEvent) => void;
@@ -24,4 +25,5 @@ export interface Reactor {
 export const ReactorRegistry: Record<string, new (arg) => Reactor> = {
   CloxReactor: CloxReactor,
   EchoReactor: EchoReactor,
+  PrefsReactor: PrefsReactor,
 };

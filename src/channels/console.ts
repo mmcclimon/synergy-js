@@ -28,6 +28,7 @@ export default class ConsoleChannel extends BaseChannel {
       isPublic: false,
       fromChannel: this,
       fromAddress: this.fromAddress,
+      fromUser: this.hub.userDirectory.resolveName(this.fromAddress),
       transportData: ctx,
       conversationAddress: this.defaultPublicReplyAddr,
     });

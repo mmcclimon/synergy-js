@@ -90,4 +90,11 @@ export class Hub {
       event.reply('Does not compute');
     }
   }
+
+  componentNamed(name: string): HubComponent | UserDirectory {
+    if (name === 'user') return this.userDirectory;
+    if (this.reactors[name]) return this.reactors[name];
+    if (this.channels[name]) return this.channels[name];
+    throw new Error(`no hub component found for ${name}`);
+  }
 }
