@@ -1,5 +1,3 @@
-import * as util from 'util';
-
 import BaseChannel from './base';
 import SynergyEvent from '../event';
 import SlackClient from '../slack-client';
@@ -53,14 +51,12 @@ export default class SlackChannel extends BaseChannel {
 
     const event = this.synergyEventFromSlackEvent(slackEvent);
     if (!event) {
-      Logger.warn(
-        util.format(
-          "couldn't convert a %s/%s message to channel %s, dropping it",
-          slackEvent.type,
-          slackEvent.subtype ? slackEvent.subType : '[none]',
-          slackEvent.channel
-        )
-      );
+      Logger.warn([
+        "couldn't convert a %s/%s message to channel %s, dropping it",
+        slackEvent.type,
+        slackEvent.subtype ? slackEvent.subType : '[none]',
+        slackEvent.channel,
+      ]);
       return;
     }
     this.hub.handleEvent(event);

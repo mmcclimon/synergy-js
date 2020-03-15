@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as util from 'util';
 
 import Environment from './environment';
 import Logger from './logger';
@@ -80,15 +79,13 @@ export class Hub {
   }
 
   handleEvent(event: SynergyEvent): void {
-    Logger.info(
-      util.format(
-        '%s event from %s/%s: %s',
-        event.type,
-        event.fromChannel.name,
-        event.fromUser ? `u:${event.fromUser.username}` : event.fromAddress,
-        event.text
-      )
-    );
+    Logger.info([
+      '%s event from %s/%s: %s',
+      event.type,
+      event.fromChannel.name,
+      event.fromUser ? `u:${event.fromUser.username}` : event.fromAddress,
+      event.text,
+    ]);
 
     this.commando.dispatch(event);
 
