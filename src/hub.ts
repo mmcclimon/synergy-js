@@ -56,6 +56,7 @@ export class Hub {
 
   async run(): Promise<void> {
     await this.env.load();
+    Object.values(this.reactors).forEach(reactor => reactor.start());
     Object.values(this.channels).forEach(channel => channel.start());
     return;
   }
