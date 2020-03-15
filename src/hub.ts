@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as util from 'util';
 
+import Environment from './environment';
 import Logger from './logger';
 import UserDirectory from './user-directory';
 import SynergyEvent from './event';
@@ -22,7 +23,7 @@ interface Config {
 
 export class Hub {
   config: Config;
-  userDirectory: UserDirectory;
+  env: Environment;
   channels: Record<string, Channel>;
   reactors: Record<string, Reactor>;
   commando: typeof Commando;
@@ -43,7 +44,7 @@ export class Hub {
     this.reactors = {};
     this.commando = Commando;
 
-    this.userDirectory = new UserDirectory(config);
+    this.env = new Environment(config);
 
     for (const thing of ['channels', 'reactors']) {
       const meth = thing === 'channels' ? 'registerChannel' : 'registerReactor';
@@ -54,7 +55,7 @@ export class Hub {
   }
 
   async run(): Promise<void> {
-    await this.userDirectory.isReady();
+    await this.env.load();
     Object.values(this.channels).forEach(channel => channel.start());
     return;
   }
@@ -71,6 +72,10 @@ export class Hub {
     this.reactors[name] = reactor;
 
     this.commando.reifyCommandsOn(reactor);
+  }
+
+  get userDirectory(): UserDirectory {
+    return this.env.userDirectory;
   }
 
   handleEvent(event: SynergyEvent): void {
