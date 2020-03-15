@@ -21,7 +21,7 @@ interface HasState {
   saveState: () => void;
 }
 
-type PrefData = Record<string, Record<string, PreferenceValue>>;
+export type PrefData = Record<string, Record<string, PreferenceValue>>;
 
 export class Preferences {
   ns: string;
@@ -126,7 +126,7 @@ export class Preferences {
     return this.prefs;
   }
 
-  load({ preferences }: { preferences: PrefData }): void {
+  load(preferences: PrefData): void {
     this.prefs = preferences;
   }
 }

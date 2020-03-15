@@ -2,8 +2,12 @@ import * as moment from 'moment-timezone';
 
 import Environment from './environment';
 import Logger from './logger';
-import { Preferences } from './preferences';
+import { Preferences, PrefData } from './preferences';
 import User from './user';
+
+type UserDirState = {
+  preferences: PrefData;
+};
 
 export default class UserDirectory {
   private _users: Record<string, User>;
@@ -26,23 +30,14 @@ export default class UserDirectory {
     return this.fetchState();
   }
 
-  // obviously, should not belong here
   saveState(): Promise<void> {
-    const data = JSON.stringify({ preferences: this.prefs });
-    return this.env.stateDb.run(
-      'INSERT OR REPLACE INTO synergy_state (reactor_name, stored_at, json) VALUES (?, ?, ?)',
-      ['users', Math.floor(Date.now() / 1000), data]
-    );
+    return this.env.saveState('users', { preferences: this.prefs });
   }
 
   fetchState(): Promise<void> {
-    return this.env.stateDb.get(
-      'SELECT json FROM synergy_state WHERE reactor_name = ?',
-      ['users'],
-      row => {
-        this.prefs.load(JSON.parse(row.json));
-      }
-    );
+    return this.env.fetchState('users').then(data => {
+      this.prefs.load(data.preferences);
+    });
   }
 
   async loadUsersFromDb(): Promise<void> {

@@ -60,4 +60,26 @@ export default class Environment {
 
     return Promise.all([p1, p2, p3]);
   }
+
+  saveState(ns: string, state: object): Promise<void> {
+    const data = JSON.stringify(state);
+    return this.stateDb.run(
+      'INSERT OR REPLACE INTO synergy_state (reactor_name, stored_at, json) VALUES (?, ?, ?)',
+      [ns, Math.floor(Date.now() / 1000), data]
+    );
+  }
+
+  async fetchState(ns: string): Promise<any> {
+    let data;
+    await this.stateDb.get(
+      'SELECT json FROM synergy_state WHERE reactor_name = ?',
+      [ns],
+      row => {
+        if (!row) return;
+        data = JSON.parse(row.json);
+      }
+    );
+
+    return data;
+  }
 }
